@@ -10,6 +10,9 @@ def load_love_data():
     if os.path.exists(LOVE_DATA_FILE):
         with open(LOVE_DATA_FILE, 'r', encoding='utf-8') as f:
             data = json.load(f)
+            # Ensure start_date is valid
+            if not data.get('start_date'):
+                data['start_date'] = datetime.now().isoformat()
             # Force C+M as couple name
             data['couple_name'] = 'C+M'
             return data
@@ -18,7 +21,6 @@ def load_love_data():
         "memories": [],
         "couple_name": "C+M",
         "initials": "C+M"
-        
     }
 
 def save_love_data(data):
@@ -34,7 +36,11 @@ def get_days():
     data = load_love_data()
     start = datetime.fromisoformat(data['start_date'])
     days = (datetime.now() - start).days
-    return jsonify({'days': days, 'couple_name': data['couple_name']})
+    return jsonify({
+        'days': days, 
+        'couple_name': data['couple_name'],
+        'start_date': data['start_date']
+    })
 
 @app.route('/api/memories', methods=['GET'])
 def get_memories():
