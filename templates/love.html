@@ -622,6 +622,7 @@
             // Otherwise keep existing background_image from currentConfig
 
             const config = {
+                ...currentConfig, // Preserve all existing config
                 background_image: background_image,
                 initials: initials
             };
