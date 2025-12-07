@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 import os
 
@@ -9,15 +9,21 @@ LOVE_DATA_FILE = 'love_data.json'
 def load_love_data():
     if os.path.exists(LOVE_DATA_FILE):
         with open(LOVE_DATA_FILE, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            # Ensure start_date is valid
-            if not data.get('start_date'):
-                data['start_date'] = datetime.now().isoformat()
-            # Force C+M as couple name
-            data['couple_name'] = 'C+M'
-            return data
+            try:
+                data = json.load(f)
+                # Ensure start_date is valid
+                if not data.get('start_date'):
+                    # Set to 30 days ago for testing
+                    data['start_date'] = (datetime.now() - timedelta(days=30)).isoformat()
+                # Force C+M as couple name
+                data['couple_name'] = 'C+M'
+                return data
+            except:
+                pass
+    
+    # Create new data with start date 30 days ago
     return {
-        "start_date": datetime.now().isoformat(),
+        "start_date": (datetime.now() - timedelta(days=30)).isoformat(),
         "memories": [],
         "couple_name": "C+M",
         "initials": "C+M"
