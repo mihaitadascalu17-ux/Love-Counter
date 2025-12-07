@@ -78,12 +78,14 @@ def config():
     
     if request.method == 'POST':
         config = request.json
+        data['background_image'] = config.get('background_image', data.get('background_image', ''))
         data['initials'] = config.get('initials', data.get('initials', 'C+M'))
         data['couple_name'] = config.get('couple_name', data['couple_name'])
         data['start_date'] = config.get('start_date', data['start_date'])
         save_love_data(data)
     
     return jsonify({
+        'background_image': data.get('background_image', ''),
         'initials': data.get('initials', 'C+M'),
         'couple_name': data['couple_name'],
         'start_date': data['start_date']

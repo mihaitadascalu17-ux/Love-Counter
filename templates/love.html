@@ -38,6 +38,27 @@
             color: white;
             padding: 30px 20px;
             text-align: center;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            background-blend-mode: overlay;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 20, 147, 0.7);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        header > * {
+            position: relative;
+            z-index: 1;
         }
 
         header h1 {
@@ -331,6 +352,11 @@
                 
                 <div class="config-section">
                     <div class="form-group">
+                        <label for="backgroundImage">Poza de fundal (URL sau încarcă)</label>
+                        <input type="text" id="backgroundImage" placeholder="Paste image URL here..." required>
+                    </div>
+
+                    <div class="form-group">
                         <label for="initialsInput">Inițialele cuplului</label>
                         <input type="text" id="initialsInput" placeholder="De ex: C+M" maxlength="5" required>
                     </div>
@@ -487,9 +513,15 @@
                 const response = await fetch(`${API_URL}/config`);
                 const config = await response.json();
                 
+                document.getElementById('backgroundImage').value = config.background_image || '';
                 document.getElementById('initialsInput').value = config.initials || 'C+M';
                 document.getElementById('coupleNameInput').value = config.couple_name;
                 document.getElementById('startDate').value = config.start_date.split('T')[0];
+                
+                // Set background image
+                if (config.background_image) {
+                    document.querySelector('header').style.backgroundImage = `url('${config.background_image}')`;
+                }
             } catch (error) {
                 console.error('Error loading config:', error);
             }
@@ -497,6 +529,7 @@
 
         async function saveConfig() {
             const config = {
+                background_image: document.getElementById('backgroundImage').value,
                 initials: document.getElementById('initialsInput').value,
                 couple_name: document.getElementById('coupleNameInput').value,
                 start_date: document.getElementById('startDate').value + 'T00:00:00'
@@ -509,6 +542,11 @@
                     body: JSON.stringify(config)
                 });
 
+                // Update background immediately
+                if (config.background_image) {
+                    document.querySelector('header').style.backgroundImage = `url('${config.background_image}')`;
+                }
+                
                 loadDays();
                 
                 const msg = document.getElementById('successMessage');
