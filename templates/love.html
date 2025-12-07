@@ -299,7 +299,6 @@
             <h1>💕 Love Counter 💕</h1>
             <div style="font-size: 48px; margin: 20px 0; animation: heartbeat 1.5s infinite;">❤️</div>
             <div style="font-size: 32px; font-weight: bold; letter-spacing: 3px;" id="initials">C + M</div>
-            <div class="couple-name" id="coupleName">Noi doi 💕</div>
             <div class="days-counter">
                 <div class="days-label">Zilele noastre împreună</div>
                 <div style="font-size: 32px; font-weight: bold; letter-spacing: 2px; margin: 15px 0; font-family: 'Courier New', monospace;">
@@ -380,11 +379,6 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="coupleNameInput">Nume cuplu</label>
-                        <input type="text" id="coupleNameInput" placeholder="De ex: Noi doi 💕" required>
-                    </div>
-
-                    <div class="form-group">
                         <label for="startDate">Data începutului</label>
                         <input type="date" id="startDate" required>
                     </div>
@@ -416,7 +410,6 @@
             try {
                 const response = await fetch(`${API_URL}/days`);
                 const data = await response.json();
-                document.getElementById('coupleName').textContent = data.couple_name;
                 
                 // Load initials from config
                 const configResponse = await fetch(`${API_URL}/config`);
@@ -531,7 +524,6 @@
                 
                 document.getElementById('backgroundImageUrl').value = (!config.background_image || config.background_image.startsWith('data:')) ? '' : config.background_image;
                 document.getElementById('initialsInput').value = config.initials || 'C+M';
-                document.getElementById('coupleNameInput').value = config.couple_name;
                 document.getElementById('startDate').value = config.start_date.split('T')[0];
                 
                 // Set background image
@@ -550,13 +542,12 @@
         async function saveConfig() {
             // Get values
             const initials = document.getElementById('initialsInput').value.trim();
-            const couple_name = document.getElementById('coupleNameInput').value.trim();
             const start_date = document.getElementById('startDate').value;
             const urlInput = document.getElementById('backgroundImageUrl').value.trim();
             const fileInput = document.getElementById('backgroundImageFile');
             
             // Validate required fields
-            if (!initials || !couple_name || !start_date) {
+            if (!initials || !start_date) {
                 alert('Te rog completează toate câmpurile obligatorii!');
                 return;
             }
@@ -583,7 +574,6 @@
             const config = {
                 background_image: background_image,
                 initials: initials,
-                couple_name: couple_name,
                 start_date: start_date + 'T00:00:00'
             };
 
