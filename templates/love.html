@@ -265,11 +265,17 @@
         <header>
             <h1>💕 Love Counter 💕</h1>
             <div style="font-size: 48px; margin: 20px 0; animation: heartbeat 1.5s infinite;">❤️</div>
-            <div style="font-size: 32px; font-weight: bold; letter-spacing: 3px;">V + M</div>
+            <div style="font-size: 32px; font-weight: bold; letter-spacing: 3px;" id="initials">C + M</div>
             <div class="couple-name" id="coupleName">Noi doi 💕</div>
             <div class="days-counter">
                 <div class="days-label">Zilele noastre împreună</div>
-                <div class="days-number" id="daysCount">0</div>
+                <div style="font-size: 24px; font-weight: bold; line-height: 1.4; margin: 15px 0;">
+                    <div><span id="daysCount">0</span> zile</div>
+                    <div><span id="hoursCount">0</span> ore</div>
+                    <div><span id="minutesCount">0</span> minute</div>
+                    <div><span id="secondsCount">0</span> secunde</div>
+                    <div style="font-size: 18px;"><span id="millisecondsCount">0</span> ms</div>
+                </div>
                 <div class="days-label">de iubire și fericire</div>
             </div>
         </header>
@@ -329,6 +335,11 @@
                 
                 <div class="config-section">
                     <div class="form-group">
+                        <label for="initialsInput">Inițialele cuplului</label>
+                        <input type="text" id="initialsInput" placeholder="De ex: C+M" maxlength="5" required>
+                    </div>
+
+                    <div class="form-group">
                         <label for="coupleNameInput">Nume cuplu</label>
                         <input type="text" id="coupleNameInput" placeholder="De ex: Noi doi 💕" required>
                     </div>
@@ -365,11 +376,43 @@
             try {
                 const response = await fetch(`${API_URL}/days`);
                 const data = await response.json();
-                document.getElementById('daysCount').textContent = data.days;
                 document.getElementById('coupleName').textContent = data.couple_name;
+                
+                // Load initials from config
+                const configResponse = await fetch(`${API_URL}/config`);
+                const config = await configResponse.json();
+                const initials = config.initials || 'C+M';
+                document.getElementById('initials').textContent = initials.split('').join(' ').toUpperCase();
+                
+                // Store start date for real-time counter
+                window.startDate = new Date(data.start_date);
             } catch (error) {
                 console.error('Error loading days:', error);
             }
+        }
+
+        function updateCounter() {
+            if (!window.startDate) return;
+            
+            const now = new Date();
+            const diff = now - window.startDate;
+            
+            const totalSeconds = Math.floor(diff / 1000);
+            const totalMinutes = Math.floor(totalSeconds / 60);
+            const totalHours = Math.floor(totalMinutes / 60);
+            const totalDays = Math.floor(totalHours / 24);
+            
+            const days = totalDays;
+            const hours = totalHours % 24;
+            const minutes = totalMinutes % 60;
+            const seconds = totalSeconds % 60;
+            const milliseconds = diff % 1000;
+            
+            document.getElementById('daysCount').textContent = days;
+            document.getElementById('hoursCount').textContent = hours;
+            document.getElementById('minutesCount').textContent = minutes;
+            document.getElementById('secondsCount').textContent = seconds;
+            document.getElementById('millisecondsCount').textContent = Math.floor(milliseconds);
         }
 
         async function loadMemories() {
@@ -448,6 +491,7 @@
                 const response = await fetch(`${API_URL}/config`);
                 const config = await response.json();
                 
+                document.getElementById('initialsInput').value = config.initials || 'C+M';
                 document.getElementById('coupleNameInput').value = config.couple_name;
                 document.getElementById('startDate').value = config.start_date.split('T')[0];
             } catch (error) {
@@ -457,6 +501,7 @@
 
         async function saveConfig() {
             const config = {
+                initials: document.getElementById('initialsInput').value,
                 couple_name: document.getElementById('coupleNameInput').value,
                 start_date: document.getElementById('startDate').value + 'T00:00:00'
             };
@@ -483,7 +528,10 @@
         loadMemories();
         loadConfig();
 
-        // Refresh every 10 seconds
+        // Update counter every 10ms for smooth animation
+        setInterval(updateCounter, 10);
+
+        // Refresh config every 10 seconds
         setInterval(loadDays, 10000);
 
         // PWA registration
@@ -492,4 +540,4 @@
         }
     </script>
 </body>
-</html>
+

@@ -9,11 +9,16 @@ LOVE_DATA_FILE = 'love_data.json'
 def load_love_data():
     if os.path.exists(LOVE_DATA_FILE):
         with open(LOVE_DATA_FILE, 'r', encoding='utf-8') as f:
-            return json.load(f)
+            data = json.load(f)
+            # Force C+M as couple name
+            data['couple_name'] = 'C+M'
+            return data
     return {
         "start_date": datetime.now().isoformat(),
         "memories": [],
-        "couple_name": "Noi doi 💕"
+        "couple_name": "C+M",
+        "initials": "C+M"
+        
     }
 
 def save_love_data(data):
@@ -61,11 +66,13 @@ def config():
     
     if request.method == 'POST':
         config = request.json
+        data['initials'] = config.get('initials', data.get('initials', 'C+M'))
         data['couple_name'] = config.get('couple_name', data['couple_name'])
         data['start_date'] = config.get('start_date', data['start_date'])
         save_love_data(data)
     
     return jsonify({
+        'initials': data.get('initials', 'C+M'),
         'couple_name': data['couple_name'],
         'start_date': data['start_date']
     })
