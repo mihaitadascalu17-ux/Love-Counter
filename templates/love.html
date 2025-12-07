@@ -157,6 +157,18 @@
             font-family: inherit;
         }
 
+        input[type="file"] {
+            padding: 8px;
+            cursor: pointer;
+        }
+
+        #imagePreview img {
+            max-width: 100%;
+            max-height: 150px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
         input:focus, textarea:focus, select:focus {
             outline: none;
             border-color: #FF1493;
@@ -352,8 +364,9 @@
                 
                 <div class="config-section">
                     <div class="form-group">
-                        <label for="backgroundImage">Poza de fundal (URL)</label>
-                        <input type="text" id="backgroundImage" placeholder="Paste image URL here...">
+                        <label for="backgroundImageFile">Poza de fundal (selectează din galerie)</label>
+                        <input type="file" id="backgroundImageFile" accept="image/*" placeholder="Alege o poză...">
+                        <div id="imagePreview" style="margin-top: 10px; text-align: center;"></div>
                     </div>
 
                     <div class="form-group">
@@ -511,7 +524,6 @@
                 const response = await fetch(`${API_URL}/config`);
                 const config = await response.json();
                 
-                document.getElementById('backgroundImage').value = config.background_image || '';
                 document.getElementById('initialsInput').value = config.initials || 'C+M';
                 document.getElementById('coupleNameInput').value = config.couple_name;
                 document.getElementById('startDate').value = config.start_date.split('T')[0];
@@ -519,6 +531,10 @@
                 // Set background image
                 if (config.background_image) {
                     document.querySelector('header').style.backgroundImage = `url('${config.background_image}')`;
+                    // Show preview if image is base64
+                    if (config.background_image.startsWith('data:')) {
+                        document.getElementById('imagePreview').innerHTML = `<img src="${config.background_image}" alt="Preview">`;
+                    }
                 }
             } catch (error) {
                 console.error('Error loading config:', error);
@@ -530,12 +546,24 @@
             const initials = document.getElementById('initialsInput').value.trim();
             const couple_name = document.getElementById('coupleNameInput').value.trim();
             const start_date = document.getElementById('startDate').value;
-            const background_image = document.getElementById('backgroundImage').value.trim();
-
+            const fileInput = document.getElementById('backgroundImageFile');
+            
             // Validate required fields
             if (!initials || !couple_name || !start_date) {
                 alert('Te rog completează toate câmpurile obligatorii!');
                 return;
+            }
+
+            let background_image = '';
+            
+            // Handle file upload if a file is selected
+            if (fileInput.files && fileInput.files[0]) {
+                const file = fileInput.files[0];
+                background_image = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.readAsDataURL(file);
+                });
             }
 
             const config = {
@@ -574,6 +602,22 @@
                 alert('Eroare: ' + error.message);
             }
         }
+
+        // Handle background image file preview
+        document.getElementById('backgroundImageFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const preview = document.getElementById('imagePreview');
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    preview.innerHTML = `<img src="${event.target.result}" alt="Preview">`;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.innerHTML = '';
+            }
+        });
 
         // Load on page load
         loadDays();
