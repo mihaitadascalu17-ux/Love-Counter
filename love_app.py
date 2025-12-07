@@ -15,8 +15,6 @@ def load_love_data():
                 if not data.get('start_date'):
                     # Set to 30 days ago for testing
                     data['start_date'] = (datetime.now() - timedelta(days=30)).isoformat()
-                # Force C+M as couple name
-                data['couple_name'] = 'C+M'
                 return data
             except:
                 pass
@@ -25,7 +23,6 @@ def load_love_data():
     return {
         "start_date": (datetime.now() - timedelta(days=30)).isoformat(),
         "memories": [],
-        "couple_name": "C+M",
         "initials": "C+M"
     }
 
@@ -44,7 +41,6 @@ def get_days():
     days = (datetime.now() - start).days
     return jsonify({
         'days': days, 
-        'couple_name': data['couple_name'],
         'start_date': data['start_date']
     })
 
@@ -80,14 +76,12 @@ def config():
         config = request.json
         data['background_image'] = config.get('background_image', data.get('background_image', ''))
         data['initials'] = config.get('initials', data.get('initials', 'C+M'))
-        data['couple_name'] = config.get('couple_name', data['couple_name'])
         data['start_date'] = config.get('start_date', data['start_date'])
         save_love_data(data)
     
     return jsonify({
         'background_image': data.get('background_image', ''),
         'initials': data.get('initials', 'C+M'),
-        'couple_name': data['couple_name'],
         'start_date': data['start_date']
     })
 
