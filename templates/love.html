@@ -364,8 +364,13 @@
                 
                 <div class="config-section">
                     <div class="form-group">
-                        <label for="backgroundImageFile">Poza de fundal (selectează din galerie)</label>
-                        <input type="file" id="backgroundImageFile" accept="image/*" placeholder="Alege o poză...">
+                        <label for="backgroundImageUrl">Poza de fundal (URL)</label>
+                        <input type="text" id="backgroundImageUrl" placeholder="Ex: https://example.com/image.jpg">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="backgroundImageFile" style="cursor: pointer; color: #FF1493; text-decoration: underline;">Sau alege din galerie 📱</label>
+                        <input type="file" id="backgroundImageFile" accept="image/*" style="display: none;">
                         <div id="imagePreview" style="margin-top: 10px; text-align: center;"></div>
                     </div>
 
@@ -524,6 +529,7 @@
                 const response = await fetch(`${API_URL}/config`);
                 const config = await response.json();
                 
+                document.getElementById('backgroundImageUrl').value = (!config.background_image || config.background_image.startsWith('data:')) ? '' : config.background_image;
                 document.getElementById('initialsInput').value = config.initials || 'C+M';
                 document.getElementById('coupleNameInput').value = config.couple_name;
                 document.getElementById('startDate').value = config.start_date.split('T')[0];
@@ -546,6 +552,7 @@
             const initials = document.getElementById('initialsInput').value.trim();
             const couple_name = document.getElementById('coupleNameInput').value.trim();
             const start_date = document.getElementById('startDate').value;
+            const urlInput = document.getElementById('backgroundImageUrl').value.trim();
             const fileInput = document.getElementById('backgroundImageFile');
             
             // Validate required fields
@@ -559,11 +566,18 @@
             // Handle file upload if a file is selected
             if (fileInput.files && fileInput.files[0]) {
                 const file = fileInput.files[0];
-                background_image = await new Promise((resolve) => {
-                    const reader = new FileReader();
-                    reader.onload = (e) => resolve(e.target.result);
-                    reader.readAsDataURL(file);
-                });
+                try {
+                    background_image = await new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => resolve(e.target.result);
+                        reader.readAsDataURL(file);
+                    });
+                } catch (error) {
+                    console.error('Error reading file:', error);
+                }
+            } else if (urlInput) {
+                // Use URL if no file is selected
+                background_image = urlInput;
             }
 
             const config = {
@@ -586,7 +600,11 @@
 
                 // Update background immediately
                 if (config.background_image) {
-                    document.querySelector('header').style.backgroundImage = `url('${config.background_image}')`;
+                    if (config.background_image.startsWith('data:')) {
+                        document.querySelector('header').style.backgroundImage = `url('${config.background_image}')`;
+                    } else {
+                        document.querySelector('header').style.backgroundImage = `url('${config.background_image}')`;
+                    }
                 } else {
                     document.querySelector('header').style.backgroundImage = '';
                 }
@@ -617,6 +635,12 @@
             } else {
                 preview.innerHTML = '';
             }
+        });
+
+        // Make label clickable to open file picker
+        document.querySelector('label[for="backgroundImageFile"]').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('backgroundImageFile').click();
         });
 
         // Load on page load
