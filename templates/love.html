@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <meta name="theme-color" content="#FF1493">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Love Counter">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%23FF1493' width='180' height='180' rx='40'/><text x='50%' y='50%' font-size='90' fill='white' text-anchor='middle' dominant-baseline='middle'>💕</text></svg>">
+    <title>Love Counter 💕</title>
+    <link rel="manifest" href="/static/love_manifest.json">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #FF1493 0%, #FFB6C1 50%, #FFF0F5 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(255, 20, 147, 0.2);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #FF1493 0%, #FF69B4 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            animation: heartbeat 1.5s infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.1); }
+            50% { transform: scale(1); }
+        }
+
+        .couple-name {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .days-counter {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 15px;
+        }
+
+        .days-number {
+            font-size: 48px;
+            font-weight: bold;
+            line-height: 1;
+            margin: 10px 0;
+        }
+
+        .days-label {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        main {
+            padding: 25px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #FFE4E1;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            color: #999;
+            font-weight: bold;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            color: #FF1493;
+            border-bottom-color: #FF1493;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #FFE4E1;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #FF1493;
+            background: #FFF0F5;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #FF1493 0%, #FF69B4 100%);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 100%;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .memory-item {
+            background: #FFF0F5;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #FF1493;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .memory-title {
+            font-weight: bold;
+            color: #FF1493;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .memory-content {
+            color: #555;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .memory-date {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 8px;
+        }
+
+        .memory-emoji {
+            font-size: 20px;
+            margin-right: 8px;
+        }
+
+        .delete-btn {
+            background: #FF6B6B;
+            padding: 6px 12px;
+            font-size: 12px;
+            width: auto;
+            margin-top: 8px;
+        }
+
+        .delete-btn:hover {
+            background: #ff5252;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 30px 0;
+            font-size: 14px;
+        }
+
+        .config-section {
+            background: #FFF0F5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 10px;
+        }
+
+        .success-message {
+            background: #4CAF50;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💕 Love Counter 💕</h1>
+            <div class="couple-name" id="coupleName">Noi doi 💕</div>
+            <div class="days-counter">
+                <div class="days-label">Zilele noastre împreună</div>
+                <div class="days-number" id="daysCount">0</div>
+                <div class="days-label">de iubire și fericire</div>
+            </div>
+        </header>
+
+        <main>
+            <div class="success-message" id="successMessage">✅ Amintire salvată!</div>
+
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('memories')">📝 Amintiri</button>
+                <button class="tab-btn" onclick="switchTab('add')">➕ Adaugă Amintire</button>
+                <button class="tab-btn" onclick="switchTab('settings')">⚙️ Setări</button>
+            </div>
+
+            <!-- Memories Tab -->
+            <div id="memories" class="tab-content active">
+                <h2 style="margin-bottom: 15px; color: #FF1493;">Amintirile noastre 💗</h2>
+                <div id="memoriesList"></div>
+            </div>
+
+            <!-- Add Memory Tab -->
+            <div id="add" class="tab-content">
+                <h2 style="margin-bottom: 20px; color: #FF1493;">Salvează o amintire frumoasă ✨</h2>
+                <form id="memoryForm">
+                    <div class="form-group">
+                        <label for="emoji">Emoji (alege-ți favorit)</label>
+                        <select id="emoji">
+                            <option value="❤️">❤️ Inimă</option>
+                            <option value="😍">😍 Ochi de inimă</option>
+                            <option value="💑">💑 Cuplu</option>
+                            <option value="😘">😘 Sărut</option>
+                            <option value="🌹">🌹 Trandafir</option>
+                            <option value="✨">✨ Stea</option>
+                            <option value="🎀">🎀 Fundă</option>
+                            <option value="💐">💐 Flori</option>
+                            <option value="🎂">🎂 Tort</option>
+                            <option value="🍽️">🍽️ Cină</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="title">Titlu amintire</label>
+                        <input type="text" id="title" placeholder="De ex: Prima noastră vacanță" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="memory">Descriere</label>
+                        <textarea id="memory" placeholder="Povestește despre acest moment special..." required></textarea>
+                    </div>
+
+                    <button type="submit">💾 Salvează Amintire</button>
+                </form>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="settings" class="tab-content">
+                <h2 style="margin-bottom: 20px; color: #FF1493;">Setări ⚙️</h2>
+                
+                <div class="config-section">
+                    <div class="form-group">
+                        <label for="coupleNameInput">Nume cuplu</label>
+                        <input type="text" id="coupleNameInput" placeholder="De ex: Noi doi 💕" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="startDate">Data începutului</label>
+                        <input type="date" id="startDate" required>
+                    </div>
+
+                    <button onclick="saveConfig()">💾 Salvează Setări</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_URL = '/api';
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        async function loadDays() {
+            try {
+                const response = await fetch(`${API_URL}/days`);
+                const data = await response.json();
+                document.getElementById('daysCount').textContent = data.days;
+                document.getElementById('coupleName').textContent = data.couple_name;
+            } catch (error) {
+                console.error('Error loading days:', error);
+            }
+        }
+
+        async function loadMemories() {
+            try {
+                const response = await fetch(`${API_URL}/memories`);
+                const memories = await response.json();
+                const listEl = document.getElementById('memoriesList');
+
+                if (memories.length === 0) {
+                    listEl.innerHTML = '<div class="empty-state">Încă nu ai amintiri salvate. Adaugă prima amintire! 💕</div>';
+                    return;
+                }
+
+                listEl.innerHTML = memories
+                    .reverse()
+                    .map(m => `
+                        <div class="memory-item">
+                            <div class="memory-title">
+                                <span class="memory-emoji">${m.emoji}</span>${m.title}
+                            </div>
+                            <div class="memory-content">${m.memory}</div>
+                            <div class="memory-date">📅 ${m.date}</div>
+                            <button class="delete-btn" onclick="deleteMemory('${m.id}')">❌ Șterge</button>
+                        </div>
+                    `).join('');
+            } catch (error) {
+                console.error('Error loading memories:', error);
+            }
+        }
+
+        document.getElementById('memoryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const memory = {
+                emoji: document.getElementById('emoji').value,
+                title: document.getElementById('title').value,
+                memory: document.getElementById('memory').value
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/memories`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(memory)
+                });
+
+                if (response.ok) {
+                    document.getElementById('memoryForm').reset();
+                    loadMemories();
+                    
+                    // Show success message
+                    const msg = document.getElementById('successMessage');
+                    msg.classList.add('show');
+                    setTimeout(() => msg.classList.remove('show'), 2000);
+                }
+            } catch (error) {
+                console.error('Error adding memory:', error);
+            }
+        });
+
+        async function deleteMemory(id) {
+            if (!confirm('Ștergi această amintire dragă? 💔')) return;
+
+            try {
+                await fetch(`${API_URL}/memories/${id}`, {
+                    method: 'DELETE'
+                });
+                loadMemories();
+            } catch (error) {
+                console.error('Error deleting memory:', error);
+            }
+        }
+
+        async function loadConfig() {
+            try {
+                const response = await fetch(`${API_URL}/config`);
+                const config = await response.json();
+                
+                document.getElementById('coupleNameInput').value = config.couple_name;
+                document.getElementById('startDate').value = config.start_date.split('T')[0];
+            } catch (error) {
+                console.error('Error loading config:', error);
+            }
+        }
+
+        async function saveConfig() {
+            const config = {
+                couple_name: document.getElementById('coupleNameInput').value,
+                start_date: document.getElementById('startDate').value + 'T00:00:00'
+            };
+
+            try {
+                await fetch(`${API_URL}/config`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(config)
+                });
+
+                loadDays();
+                
+                const msg = document.getElementById('successMessage');
+                msg.classList.add('show');
+                setTimeout(() => msg.classList.remove('show'), 2000);
+            } catch (error) {
+                console.error('Error saving config:', error);
+            }
+        }
+
+        // Load on page load
+        loadDays();
+        loadMemories();
+        loadConfig();
+
+        // Refresh every 10 seconds
+        setInterval(loadDays, 10000);
+
+        // PWA registration
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/static/sw.js');
+        }
+    </script>
+</body>
+</html>

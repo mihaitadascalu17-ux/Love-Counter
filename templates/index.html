@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#4CAF50">
+    <title>Tracker Cheltuieli</title>
+    <link rel="manifest" href="/static/manifest.json">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding: 10px 0;
+            font-size: 14px;
+        }
+
+        .summary-item {
+            text-align: center;
+        }
+
+        .summary-item span {
+            display: block;
+            opacity: 0.9;
+        }
+
+        .summary-item .value {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background: #f9f9f9;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 10px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 100%;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .transactions-section {
+            margin-top: 30px;
+            border-top: 2px solid #f0f0f0;
+            padding-top: 20px;
+        }
+
+        .transactions-section h2 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 20px;
+        }
+
+        .transaction-item {
+            background: #f9f9f9;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .transaction-info {
+            flex: 1;
+        }
+
+        .transaction-category {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 3px;
+        }
+
+        .transaction-description {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 3px;
+        }
+
+        .transaction-date {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .transaction-amount {
+            font-size: 18px;
+            font-weight: bold;
+            color: #d32f2f;
+            margin-right: 15px;
+            min-width: 70px;
+            text-align: right;
+        }
+
+        .delete-btn {
+            background: #d32f2f;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .delete-btn:hover {
+            background: #b71c1c;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 30px 0;
+            font-size: 14px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 8px;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💰 Tracker Cheltuieli</h1>
+            <div class="summary">
+                <div class="summary-item">
+                    <span>Total:</span>
+                    <span class="value" id="totalSpent">0 £</span>
+                </div>
+                <div class="summary-item">
+                    <span>Tranzacții:</span>
+                    <span class="value" id="transactionCount">0</span>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <form id="addForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="amount">Suma (£)</label>
+                        <input type="number" id="amount" step="0.01" placeholder="0.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Categorie</label>
+                        <select id="category" required>
+                            <option value="">Alege...</option>
+                            <option value="Mâncare">🍔 Mâncare</option>
+                            <option value="Transport">🚗 Transport</option>
+                            <option value="Cumpărături">🛍️ Cumpărături</option>
+                            <option value="Divertisment">🎮 Divertisment</option>
+                            <option value="Sănătate">⚕️ Sănătate</option>
+                            <option value="Facturi">📄 Facturi</option>
+                            <option value="Altele">📌 Altele</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Descriere (opțional)</label>
+                    <textarea id="description" placeholder="Adaugă o notă..."></textarea>
+                </div>
+
+                <button type="submit">➕ Adaugă Cheltuială</button>
+            </form>
+
+            <div class="stats" id="stats"></div>
+
+            <div class="transactions-section">
+                <h2>📋 Ultimele Tranzacții</h2>
+                <div id="transactionsList"></div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_URL = '/api';
+
+        async function loadTransactions() {
+            try {
+                const response = await fetch(`${API_URL}/transactions`);
+                const transactions = await response.json();
+                
+                const listEl = document.getElementById('transactionsList');
+                
+                if (transactions.length === 0) {
+                    listEl.innerHTML = '<div class="empty-state">Nu ai cheltuieli înregistrate. Adaugă una!</div>';
+                    return;
+                }
+
+                listEl.innerHTML = transactions
+                    .sort((a, b) => new Date(b.id) - new Date(a.id))
+                    .map(t => `
+                        <div class="transaction-item">
+                            <div class="transaction-info">
+                                <div class="transaction-category">${t.category}</div>
+                                ${t.description ? `<div class="transaction-description">${t.description}</div>` : ''}
+                                <div class="transaction-date">${new Date(t.id).toLocaleString('ro-RO')}</div>
+                            </div>
+                            <div class="transaction-amount">${t.amount} £</div>
+                            <button class="delete-btn" onclick="deleteTransaction('${t.id}')">Șterge</button>
+                        </div>
+                    `).join('');
+                
+                updateSummary();
+            } catch (error) {
+                console.error('Error loading transactions:', error);
+            }
+        }
+
+        async function updateSummary() {
+            try {
+                const response = await fetch(`${API_URL}/summary`);
+                const summary = await response.json();
+                
+                document.getElementById('totalSpent').textContent = `${summary.total.toFixed(2)} £`;
+                document.getElementById('transactionCount').textContent = summary.count;
+
+                // Display category stats
+                const statsEl = document.getElementById('stats');
+                statsEl.innerHTML = Object.entries(summary.by_category)
+                    .slice(0, 4)
+                    .map(([category, amount]) => `
+                        <div class="stat-item">
+                            <div class="stat-label">${category}</div>
+                            <div class="stat-value">${amount.toFixed(2)} £</div>
+                        </div>
+                    `).join('');
+            } catch (error) {
+                console.error('Error updating summary:', error);
+            }
+        }
+
+        document.getElementById('addForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const transaction = {
+                amount: parseFloat(document.getElementById('amount').value),
+                category: document.getElementById('category').value,
+                description: document.getElementById('description').value
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/transactions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(transaction)
+                });
+
+                if (response.ok) {
+                    document.getElementById('addForm').reset();
+                    loadTransactions();
+                }
+            } catch (error) {
+                console.error('Error adding transaction:', error);
+            }
+        });
+
+        async function deleteTransaction(id) {
+            if (!confirm('Ești sigur că vrei să ștergi această cheltuială?')) return;
+
+            try {
+                await fetch(`${API_URL}/transactions/${id}`, {
+                    method: 'DELETE'
+                });
+                loadTransactions();
+            } catch (error) {
+                console.error('Error deleting transaction:', error);
+            }
+        }
+
+        // Load transactions on page load
+        loadTransactions();
+        setInterval(updateSummary, 5000);
+
+        // PWA registration
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/static/sw.js');
+        }
+    </script>
+</body>
+</html>
