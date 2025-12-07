@@ -428,13 +428,11 @@
             const hours = totalHours % 24;
             const minutes = totalMinutes % 60;
             const seconds = totalSeconds % 60;
-            const milliseconds = diff % 1000;
             
             document.getElementById('daysCount').textContent = days;
             document.getElementById('hoursCount').textContent = hours;
             document.getElementById('minutesCount').textContent = minutes;
             document.getElementById('secondsCount').textContent = seconds;
-            document.getElementById('millisecondsCount').textContent = Math.floor(milliseconds);
         }
 
         async function loadMemories() {
