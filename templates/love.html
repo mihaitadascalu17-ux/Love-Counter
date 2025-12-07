@@ -526,32 +526,52 @@
         }
 
         async function saveConfig() {
+            // Get values
+            const initials = document.getElementById('initialsInput').value.trim();
+            const couple_name = document.getElementById('coupleNameInput').value.trim();
+            const start_date = document.getElementById('startDate').value;
+            const background_image = document.getElementById('backgroundImage').value.trim();
+
+            // Validate required fields
+            if (!initials || !couple_name || !start_date) {
+                alert('Te rog completează toate câmpurile obligatorii!');
+                return;
+            }
+
             const config = {
-                background_image: document.getElementById('backgroundImage').value,
-                initials: document.getElementById('initialsInput').value,
-                couple_name: document.getElementById('coupleNameInput').value,
-                start_date: document.getElementById('startDate').value + 'T00:00:00'
+                background_image: background_image,
+                initials: initials,
+                couple_name: couple_name,
+                start_date: start_date + 'T00:00:00'
             };
 
             try {
-                await fetch(`${API_URL}/config`, {
+                const response = await fetch(`${API_URL}/config`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(config)
                 });
 
+                if (!response.ok) {
+                    throw new Error('Eroare la salvarea setărilor');
+                }
+
                 // Update background immediately
                 if (config.background_image) {
                     document.querySelector('header').style.backgroundImage = `url('${config.background_image}')`;
+                } else {
+                    document.querySelector('header').style.backgroundImage = '';
                 }
                 
                 loadDays();
                 
                 const msg = document.getElementById('successMessage');
+                msg.textContent = '✅ Setări salvate!';
                 msg.classList.add('show');
                 setTimeout(() => msg.classList.remove('show'), 2000);
             } catch (error) {
                 console.error('Error saving config:', error);
+                alert('Eroare: ' + error.message);
             }
         }
 
