@@ -546,7 +546,10 @@
                 return;
             }
 
-            let background_image = '';
+            // Load current config to preserve background if not changed
+            const currentConfigResponse = await fetch(`${API_URL}/config`);
+            const currentConfig = await currentConfigResponse.json();
+            let background_image = currentConfig.background_image || '';
             
             // Handle file upload if a file is selected
             if (fileInput.files && fileInput.files[0]) {
@@ -561,9 +564,10 @@
                     console.error('Error reading file:', error);
                 }
             } else if (urlInput) {
-                // Use URL if no file is selected
+                // Use URL if provided
                 background_image = urlInput;
             }
+            // Otherwise keep existing background_image from currentConfig
 
             const config = {
                 background_image: background_image,
