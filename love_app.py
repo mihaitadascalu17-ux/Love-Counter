@@ -11,17 +11,15 @@ def load_love_data():
         with open(LOVE_DATA_FILE, 'r', encoding='utf-8') as f:
             try:
                 data = json.load(f)
-                # Ensure start_date is valid
-                if not data.get('start_date'):
-                    # Set to 30 days ago for testing
-                    data['start_date'] = (datetime.now() - timedelta(days=30)).isoformat()
+                # Force start date to 5.07.2021
+                data['start_date'] = '2021-07-05T00:00:00'
                 return data
             except:
                 pass
     
-    # Create new data with start date 30 days ago
+    # Create new data with fixed start date
     return {
-        "start_date": (datetime.now() - timedelta(days=30)).isoformat(),
+        "start_date": "2021-07-05T00:00:00",
         "memories": [],
         "initials": "C+M"
     }
@@ -76,7 +74,8 @@ def config():
         config = request.json
         data['background_image'] = config.get('background_image', data.get('background_image', ''))
         data['initials'] = config.get('initials', data.get('initials', 'C+M'))
-        data['start_date'] = config.get('start_date', data['start_date'])
+        # Keep start_date locked to 2021-07-05
+        data['start_date'] = '2021-07-05T00:00:00'
         save_love_data(data)
     
     return jsonify({
