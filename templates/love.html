@@ -314,6 +314,7 @@
 
             <div class="tabs">
                 <button class="tab-btn active" onclick="switchTab('memories')">📝 Amintiri</button>
+                <button class="tab-btn" onclick="switchTab('profiles')">👫 Noi</button>
                 <button class="tab-btn" onclick="switchTab('add')">➕ Adaugă Amintire</button>
                 <button class="tab-btn" onclick="switchTab('settings')">⚙️ Setări</button>
             </div>
@@ -322,6 +323,57 @@
             <div id="memories" class="tab-content active">
                 <h2 style="margin-bottom: 15px; color: #FF1493;">Amintirile noastre 💗</h2>
                 <div id="memoriesList"></div>
+            </div>
+
+            <!-- Profiles Tab -->
+            <div id="profiles" class="tab-content">
+                <h2 style="margin-bottom: 20px; color: #FF1493;">Despre Noi 💕</h2>
+                
+                <!-- Person 1 Profile -->
+                <div class="config-section">
+                    <h3 style="color: #FF1493; margin-bottom: 15px;">👨 El</h3>
+                    <div id="profile1Display" style="text-align: center; margin-bottom: 15px;">
+                        <div id="profile1Photo" style="margin-bottom: 10px;">
+                            <div style="width: 150px; height: 150px; border-radius: 50%; background: #FFE4E1; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 48px;">
+                                👨
+                            </div>
+                        </div>
+                        <div id="profile1Name" style="font-size: 20px; font-weight: bold; color: #FF1493;">Numele tău</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="person1Name">Nume</label>
+                        <input type="text" id="person1Name" placeholder="Scrie numele tău">
+                    </div>
+                    <div class="form-group">
+                        <label for="person1PhotoFile" style="cursor: pointer; color: #FF1493; text-decoration: underline;">Alege poză 📷</label>
+                        <input type="file" id="person1PhotoFile" accept="image/*" style="display: none;">
+                        <div id="person1Preview" style="margin-top: 10px; text-align: center;"></div>
+                    </div>
+                    <button onclick="saveProfile1()">💾 Salvează</button>
+                </div>
+
+                <!-- Person 2 Profile -->
+                <div class="config-section">
+                    <h3 style="color: #FF1493; margin-bottom: 15px;">👩 Ea</h3>
+                    <div id="profile2Display" style="text-align: center; margin-bottom: 15px;">
+                        <div id="profile2Photo" style="margin-bottom: 10px;">
+                            <div style="width: 150px; height: 150px; border-radius: 50%; background: #FFE4E1; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 48px;">
+                                👩
+                            </div>
+                        </div>
+                        <div id="profile2Name" style="font-size: 20px; font-weight: bold; color: #FF1493;">Numele ei</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="person2Name">Nume</label>
+                        <input type="text" id="person2Name" placeholder="Scrie numele ei">
+                    </div>
+                    <div class="form-group">
+                        <label for="person2PhotoFile" style="cursor: pointer; color: #FF1493; text-decoration: underline;">Alege poză 📷</label>
+                        <input type="file" id="person2PhotoFile" accept="image/*" style="display: none;">
+                        <div id="person2Preview" style="margin-top: 10px; text-align: center;"></div>
+                    </div>
+                    <button onclick="saveProfile2()">💾 Salvează</button>
+                </div>
             </div>
 
             <!-- Add Memory Tab -->
@@ -630,10 +682,128 @@
             document.getElementById('backgroundImageFile').click();
         });
 
+        // Profile 1 functions
+        document.getElementById('person1PhotoFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    document.getElementById('person1Preview').innerHTML = `<img src="${event.target.result}" alt="Preview" style="max-width: 150px; border-radius: 50%;">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.querySelector('label[for="person1PhotoFile"]').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('person1PhotoFile').click();
+        });
+
+        async function saveProfile1() {
+            const name = document.getElementById('person1Name').value.trim();
+            const fileInput = document.getElementById('person1PhotoFile');
+            
+            const currentConfigResponse = await fetch(`${API_URL}/config`);
+            const currentConfig = await currentConfigResponse.json();
+            let photo = currentConfig.person1_photo || '';
+            
+            if (fileInput.files && fileInput.files[0]) {
+                const file = fileInput.files[0];
+                photo = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.readAsDataURL(file);
+                });
+            }
+            
+            const config = { ...currentConfig, person1_name: name, person1_photo: photo };
+            await fetch(`${API_URL}/config`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(config)
+            });
+            
+            loadProfiles();
+            alert('✅ Profil salvat!');
+        }
+
+        // Profile 2 functions
+        document.getElementById('person2PhotoFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    document.getElementById('person2Preview').innerHTML = `<img src="${event.target.result}" alt="Preview" style="max-width: 150px; border-radius: 50%;">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.querySelector('label[for="person2PhotoFile"]').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('person2PhotoFile').click();
+        });
+
+        async function saveProfile2() {
+            const name = document.getElementById('person2Name').value.trim();
+            const fileInput = document.getElementById('person2PhotoFile');
+            
+            const currentConfigResponse = await fetch(`${API_URL}/config`);
+            const currentConfig = await currentConfigResponse.json();
+            let photo = currentConfig.person2_photo || '';
+            
+            if (fileInput.files && fileInput.files[0]) {
+                const file = fileInput.files[0];
+                photo = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.readAsDataURL(file);
+                });
+            }
+            
+            const config = { ...currentConfig, person2_name: name, person2_photo: photo };
+            await fetch(`${API_URL}/config`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(config)
+            });
+            
+            loadProfiles();
+            alert('✅ Profil salvat!');
+        }
+
+        async function loadProfiles() {
+            try {
+                const response = await fetch(`${API_URL}/config`);
+                const config = await response.json();
+                
+                // Load person 1
+                if (config.person1_name) {
+                    document.getElementById('person1Name').value = config.person1_name;
+                    document.getElementById('profile1Name').textContent = config.person1_name;
+                }
+                if (config.person1_photo) {
+                    document.getElementById('profile1Photo').innerHTML = `<img src="${config.person1_photo}" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover;">`;
+                }
+                
+                // Load person 2
+                if (config.person2_name) {
+                    document.getElementById('person2Name').value = config.person2_name;
+                    document.getElementById('profile2Name').textContent = config.person2_name;
+                }
+                if (config.person2_photo) {
+                    document.getElementById('profile2Photo').innerHTML = `<img src="${config.person2_photo}" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover;">`;
+                }
+            } catch (error) {
+                console.error('Error loading profiles:', error);
+            }
+        }
+
         // Load on page load
         loadDays();
         loadMemories();
         loadConfig();
+        loadProfiles();
 
         // Update counter every 10ms for smooth animation
         setInterval(updateCounter, 10);

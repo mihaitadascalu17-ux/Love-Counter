@@ -74,6 +74,10 @@ def config():
         config = request.json
         data['background_image'] = config.get('background_image', data.get('background_image', ''))
         data['initials'] = config.get('initials', data.get('initials', 'C+M'))
+        data['person1_name'] = config.get('person1_name', data.get('person1_name', ''))
+        data['person1_photo'] = config.get('person1_photo', data.get('person1_photo', ''))
+        data['person2_name'] = config.get('person2_name', data.get('person2_name', ''))
+        data['person2_photo'] = config.get('person2_photo', data.get('person2_photo', ''))
         # Keep start_date locked to 2021-07-05
         data['start_date'] = '2021-07-05T00:00:00'
         save_love_data(data)
@@ -81,6 +85,10 @@ def config():
     return jsonify({
         'background_image': data.get('background_image', ''),
         'initials': data.get('initials', 'C+M'),
+        'person1_name': data.get('person1_name', ''),
+        'person1_photo': data.get('person1_photo', ''),
+        'person2_name': data.get('person2_name', ''),
+        'person2_photo': data.get('person2_photo', ''),
         'start_date': data['start_date']
     })
 
